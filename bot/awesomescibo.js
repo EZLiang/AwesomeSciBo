@@ -495,7 +495,7 @@ function showLocalLeaderboard(message) {
       if (guildScores.length < 10) {
         // Need at least 10 scores for top 10
         return message.reply(
-          `There are only ${guildScores.length} users, we need at least 10!`;
+          `There are only ${guildScores.length} users, we need at least 10!`
         );
       }
 
