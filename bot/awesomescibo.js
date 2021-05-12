@@ -468,6 +468,58 @@ function aboutMessage(message) {
   );
 }
 
+function showLocalLeaderboard(message) {
+  let messageContent = "";
+  let guildScores = [];
+  userScore
+    .find({})
+    .sort({ score: -1 }) // Sort by descending order
+    .exec((err, obj) => {
+      if (err) {
+        console.log(err);
+        return message.reply(
+          "Uh oh! :( There was an internal error. Please try again."
+        );
+      }
+
+      obj.forEach(item => {
+        const member = message.guild.members.fetch(obj.authorID);
+        // If the number of members is not 0
+        if (member.size) {
+          guildScores.push(`<@${obj.authorID}>: ${obj.score}`);
+        }
+      });
+
+      console.log(guildScores)
+
+      if (guildScores.length < 10) {
+        // Need at least 10 scores for top 10
+        return message.reply(
+          `There are only ${obj.length} users, we need at least 10!`;
+        );
+      }
+
+      guildScores.forEach((item, index) => {
+        messageContent += `${index + 1}: ${item}`;
+      });
+
+      message.channel.send(
+        new Discord.MessageEmbed()
+          .setTitle("Top Ten In This Server!")
+          .setDescription(messageContent)
+      );
+    });
+}
+
+function aboutMessage(message) {
+  message.channel.send(
+    new Discord.MessageEmbed().setTitle("Contributors: ").setDescription(`
+        <@745063586422063214> [ADawesomeguy#2235]
+        <@650525101048987649> [tEjAs#8127]
+      `) // Add more contributors here, first one is Abheek, second one is Tejas
+  );
+}
+
 async function userRounds(message) {
   let rounds = await generatedRound.find({ requestedBy: message.author.id });
   let finalMessage = "";
@@ -526,6 +578,9 @@ client.on("message", async (message) => {
         break;
       case "dobetop": // Top 10 scores
         showLeaderboard(message);
+        break;
+      case "dobetopserver":
+        showLocalLeaderboard(message);
         break;
       case "dobehappy": // Send happy message
         dontWorryBeHappy(message);
